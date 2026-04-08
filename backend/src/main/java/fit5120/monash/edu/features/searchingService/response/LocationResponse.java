@@ -1,0 +1,19 @@
+package fit5120.monash.edu.features.searchingService.response;
+
+import lombok.Data;
+
+@Data
+public class LocationResponse {
+
+    private Integer id;
+    private String address;
+    private String suburb;
+    private String state;
+    private String postcode;
+    private String type;
+    private Double distance;
+    private Double latitude;
+    private Double longitude;
+
+
+}
