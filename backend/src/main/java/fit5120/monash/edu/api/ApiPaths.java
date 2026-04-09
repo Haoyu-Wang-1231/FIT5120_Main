@@ -8,7 +8,7 @@ public final class ApiPaths {
 
         public static final String GETALLSERVICESLOCATION = "/allServicesLocation";
         public static final String GETSERVICELOCATIONBYID = "/getServiceLocation";
-        
+        public static final String GETLOCATIONDETAILS = "/getLocationDetail";
         
     }
 }

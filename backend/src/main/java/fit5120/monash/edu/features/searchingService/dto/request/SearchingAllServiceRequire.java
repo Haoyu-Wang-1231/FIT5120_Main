@@ -1,4 +1,4 @@
-package fit5120.monash.edu.features.searchingService.request;
+package fit5120.monash.edu.features.searchingService.dto.request;
 
 import lombok.Data;
 

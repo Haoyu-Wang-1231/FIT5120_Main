@@ -6,12 +6,36 @@
     <select id="getAllServicesLocation" resultType="fit5120.monash.edu.entity.Location">
         SELECT
             *
-        FROM location
+        FROM location;
     </select>
 
     <select id="selectLocationById" resultType="fit5120.monash.edu.entity.Location">
         select *
         from location
-        where id = #{id}
+        where id = #{id};
     </select>
+
+    <select id="selectLocationByDistance" resultType="fit5120.monash.edu.entity.Location">
+        SELECT
+            id,
+            latitude,
+            longitude,
+            (
+                6371000 * 2 * ASIN(
+                    SQRT(
+                        POWER(SIN(RADIANS(latitude - #{latitude}) / 2), 2) +
+                        COS(RADIANS(#{latitude})) * COS(RADIANS(latitude)) *
+                        POWER(SIN(RADIANS(longitude - #{longitude}) / 2), 2)
+                    )
+                )
+            ) AS distance
+        FROM location
+        HAVING distance &lt;= 100
+        ORDER BY distance asc
+        limit 1;
+
+    </select>
+
+
+
 </mapper>
