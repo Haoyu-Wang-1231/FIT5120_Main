@@ -3,11 +3,63 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="fit5120.monash.edu.features.searchingService.LocationMapper">
-    <select id="getAllServicesLocation" resultType="fit5120.monash.edu.entity.Location">
+
+    <select id="getAllLocations" resultType="fit5120.monash.edu.entity.Location">
         SELECT
             *
         FROM location;
     </select>
+
+    <select id="getAccessibilityOptionService" resultType="fit5120.monash.edu.features.searchingService.dto.model.AccessibilityOptionsModel">
+        SELECT
+            s.serviceName,
+            s.placeName,
+            s.rating,
+            s.ratingNumber,
+            s.weekdayDescription,
+            l.latitude AS latitude,
+            l.longitude as longitude,
+            t.serviceType as serviceType
+        FROM service s
+        LEFT JOIN location l ON s.locationId = l.id
+        LEFT JOIN serviceType t ON s.serviceTypeId = t.id
+        <where>
+            <if test="wheelchairPark != null and wheelchairPark == true" >
+                AND s.wheelchairPark = #{wheelchairPark}
+            </if>
+
+            <if test="wheelchairEntrance != null and wheelchairEntrance == true">
+                AND s.wheelchairEntrance = #{wheelchairEntrance}
+            </if>
+
+            <if test="wheelchairRestroom != null and wheelchairRestroom == true">
+                AND s.wheelchairRestroom = #{wheelchairRestroom}
+            </if>
+
+            <if test="wheelchairSeating != null and wheelchairSeating == true">
+                AND s.wheelchairSeating = #{wheelchairSeating}
+            </if>
+        </where>
+    </select>
+
+
+    <select id="getServiceDetailById">
+        select
+            S.*,
+            l.address,
+            l.suburb,
+            l.state,
+            l.postcode,
+            l.latitude,
+            l.longitude,
+            t.serviceType
+        FROM service s
+        LEFT JOIN location l ON s.locationId = l.id
+        LEFT JOIN serviceType t ON s.serviceTypeId = t.id
+        where s.id = #{id};
+
+    </select>
+
 
     <select id="selectLocationById" resultType="fit5120.monash.edu.entity.Location">
         select *
@@ -15,35 +67,34 @@
         where id = #{id};
     </select>
 
-    <insert id="addNewLocation" parameterType="fit5120.monash.edu.entity.Location">
-        insert into location (
-            address, suburb, state, postcode, accessibilityOption, openTime, latitude, longitude
-        ) values(
-            #{address}, #{suburb}, #{state}, #{postcode}, #{accessibilityOption}, #{openTime}, #{latitude}, #{longitude}
-        );
-    </insert>
+<!--    <insert id="addNewLocation" parameterType="fit5120.monash.edu.entity.Location">-->
+<!--        insert into location (-->
+<!--            address, suburb, state, postcode, accessibilityOption, openTime, latitude, longitude-->
+<!--        ) values(-->
+<!--            #{address}, #{suburb}, #{state}, #{postcode}, #{accessibilityOption}, #{openTime}, #{latitude}, #{longitude}-->
+<!--        );-->
+<!--    </insert>-->
 
 
-    <select id="selectLocationByDistance" resultType="fit5120.monash.edu.entity.Location">
-        SELECT
-            id,
-            latitude,
-            longitude,
-            (
-                6371000 * 2 * ASIN(
-                    SQRT(
-                        POWER(SIN(RADIANS(latitude - #{latitude}) / 2), 2) +
-                        COS(RADIANS(#{latitude})) * COS(RADIANS(latitude)) *
-                        POWER(SIN(RADIANS(longitude - #{longitude}) / 2), 2)
-                    )
-                )
-            ) AS distance
-        FROM location
-        HAVING distance &lt;= 100
-        ORDER BY distance asc
-        limit 1;
-
-    </select>
+<!--    <select id="selectLocationByDistance" resultType="fit5120.monash.edu.entity.Location">-->
+<!--        SELECT-->
+<!--            id,-->
+<!--            latitude,-->
+<!--            longitude,-->
+<!--            (-->
+<!--                6371000 * 2 * ASIN(-->
+<!--                    SQRT(-->
+<!--                        POWER(SIN(RADIANS(latitude - #{latitude}) / 2), 2) +-->
+<!--                        COS(RADIANS(#{latitude})) * COS(RADIANS(latitude)) *-->
+<!--                        POWER(SIN(RADIANS(longitude - #{longitude}) / 2), 2)-->
+<!--                    )-->
+<!--                )-->
+<!--            ) AS distance-->
+<!--        FROM location-->
+<!--        HAVING distance &lt;= 100-->
+<!--        ORDER BY distance asc-->
+<!--        limit 1;-->
+<!--    </select>-->
 
 
 

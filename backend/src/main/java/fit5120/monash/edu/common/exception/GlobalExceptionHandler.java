@@ -16,6 +16,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public Resp<?> handleException(Exception e){
+        e.printStackTrace();
         return Resp.error(RespEnum.SERVICE_ERROR);
     }
 

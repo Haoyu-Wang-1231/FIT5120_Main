@@ -1,12 +1,9 @@
-package fit5120.monash.edu.entity;
+package fit5120.monash.edu.features.searchingService.dto.model;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
-public class Service {
-
+public class ServiceDetail {
     private Integer id;
     private String serviceName;
     private String placeName;
@@ -22,8 +19,13 @@ public class Service {
 
     private String weekdayDescription;
 
-    //foreign key:
-    private Integer locationId;
-    private Integer serviceTypeId;
+    private String address;
+    private String suburb;
+    private String state;
+    private String postcode;
+    private Double latitude;
+    private Double longitude;
+
+    private String serviceType;
 
 }

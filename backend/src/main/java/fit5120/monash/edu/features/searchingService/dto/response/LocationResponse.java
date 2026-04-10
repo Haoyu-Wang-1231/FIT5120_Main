@@ -14,20 +14,20 @@ public class LocationResponse {
     private String suburb;
     private String state;
     private String postcode;
-    private Map<String, Object> accessibilityOption;
-    private OpenTime openTime;
+//    private Map<String, Object> accessibilityOption;
+//    private OpenTime openTime;
     private Double distance;
     private Double latitude;
     private Double longitude;
 
 
-    @Data
-    public static class OpenTime{
-        private Boolean openNow;
-        private List<String> weekdayDescriptions;
-
-
-    }
+//    @Data
+//    public static class OpenTime{
+//        private Boolean openNow;
+//        private List<String> weekdayDescriptions;
+//
+//
+//    }
 
 
 }

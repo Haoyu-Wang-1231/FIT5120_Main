@@ -12,8 +12,6 @@ public class Location {
     private String suburb;
     private String state;
     private String postcode;
-    private String accessibilityOption;
-    private String openTime;
     private Double latitude;
     private Double longitude;
 

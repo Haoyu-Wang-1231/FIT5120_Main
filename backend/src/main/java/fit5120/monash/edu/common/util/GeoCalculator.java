@@ -17,7 +17,6 @@ public class GeoCalculator {
         Double c = 2 * Math.asin(Math.sqrt(a));
 
         return EARTH_RADIUS * c; // km
-
     }
 
 //    public static double distance(double lat1, double lon1,
