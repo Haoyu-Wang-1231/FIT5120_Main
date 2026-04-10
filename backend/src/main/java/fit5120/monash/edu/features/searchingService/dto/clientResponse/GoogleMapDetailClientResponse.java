@@ -4,19 +4,16 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Data
 public class GoogleMapDetailClientResponse {
-
     private String name;
     private String formattedAddress;
     private String nationalPhoneNumber;
-
     private String googleMapsUri;
     private String websiteUri;
-
     private Map<String, Boolean> accessibilityOptions;
-
     private Location location;
     private PostalAddress postalAddress;
     private CurrentOpeningHours currentOpeningHours;
@@ -26,7 +23,6 @@ public class GoogleMapDetailClientResponse {
         private Double latitude;
         private Double longitude;
     }
-
     @Data
     public static class PostalAddress{
         private String regionCode;
@@ -35,13 +31,10 @@ public class GoogleMapDetailClientResponse {
         private String locality; //suburb
 
     }
-
     @Data
     public static class CurrentOpeningHours{
         private Boolean openNow;
         private List<String> weekdayDescriptions;
         private String nextOpenTime;
     }
-
-
 }

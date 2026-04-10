@@ -10,8 +10,9 @@ import java.util.List;
 @Mapper
 public interface LocationMapper {
 
-    Location selectLocationById(@Param("id") Integer id);
+    int addNewLocation(Location location);
 
+    Location selectLocationById(@Param("id") Integer id);
 
     List<Location> getAllServicesLocation();
 

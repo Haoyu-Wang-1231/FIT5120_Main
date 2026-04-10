@@ -15,6 +15,15 @@
         where id = #{id};
     </select>
 
+    <insert id="addNewLocation" parameterType="fit5120.monash.edu.entity.Location">
+        insert into location (
+            address, suburb, state, postcode, accessibilityOption, openTime, latitude, longitude
+        ) values(
+            #{address}, #{suburb}, #{state}, #{postcode}, #{accessibilityOption}, #{openTime}, #{latitude}, #{longitude}
+        );
+    </insert>
+
+
     <select id="selectLocationByDistance" resultType="fit5120.monash.edu.entity.Location">
         SELECT
             id,
