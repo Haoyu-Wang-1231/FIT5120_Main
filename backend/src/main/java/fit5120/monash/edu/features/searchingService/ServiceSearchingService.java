@@ -18,8 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Slf4j
@@ -39,9 +44,51 @@ public class ServiceSearchingService {
     @Autowired
     private LocationMapper locationMapper;
 
-    private void prepareRequest(){
+    private static  Boolean timeChecker(List<String> weekdayDescriptions){
 
+        LocalDateTime now = LocalDateTime.now();
+        DayOfWeek today = now.getDayOfWeek();
+        LocalTime currentTime = now.toLocalTime();
+
+        String todayStr = today.toString();
+        todayStr = todayStr.substring(0,1) + todayStr.substring(1).toLowerCase();
+
+        String finalTodayStr = todayStr;
+        String todayHours = weekdayDescriptions.stream()
+                .filter(s -> s.startsWith(finalTodayStr))
+                .findFirst()
+                .orElse(null);
+        log.info("today's hours: " + todayHours);
+        if (todayHours == null) return false;
+
+        try {
+            String timeRange = todayHours.split(": ")[1];
+
+            timeRange = timeRange
+                    .replace("\u202F", " ")
+                    .replace("\u2009", " ")
+                    .replace("–", "-");
+
+            String[] times = timeRange.split(" - ");
+
+
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
+
+            LocalTime openTime = LocalTime.parse(times[0], formatter);
+            LocalTime closeTime = LocalTime.parse(times[1], formatter);
+
+
+            return !currentTime.isBefore(openTime)
+                    && currentTime.isBefore(closeTime);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
+
+
 
 
     private static LocationResponse getLocationResponse(Location location, Double distance) {
@@ -55,14 +102,26 @@ public class ServiceSearchingService {
         response.setLatitude(location.getLatitude());
         response.setLongitude(location.getLongitude());
 
-        response.setAccessibilityOption(
-                JsonUtil.toMap(location.getAccessibilityOption())
-        );
 
-        response.setOpenTime(
-                JsonUtil.toObject(location.getOpenTime(), GoogleMapDetailClientResponse.CurrentOpeningHours.class)
-        );
+        if(location.getAccessibilityOption() != null){
+            response.setAccessibilityOption(
+                    JsonUtil.toMap(location.getAccessibilityOption())
+            );
+        }
+        if(location.getOpenTime() != null){
 
+            GoogleMapDetailClientResponse.CurrentOpeningHours googleFormatOpenTime =
+                    JsonUtil.toObject(location.getOpenTime(), GoogleMapDetailClientResponse.CurrentOpeningHours.class);
+
+            if(googleFormatOpenTime.getWeekdayDescriptions() != null){
+                LocationResponse.OpenTime openTime = new LocationResponse.OpenTime();
+                openTime.setWeekdayDescriptions(googleFormatOpenTime.getWeekdayDescriptions());
+//                log.info(openTime.getWeekdayDescriptions().toString());
+//                log.info(timeChecker(openTime.getWeekdayDescriptions()).toString());
+                openTime.setOpenNow(timeChecker(openTime.getWeekdayDescriptions()));
+                response.setOpenTime(openTime);
+            }
+        }
         return response;
     }
 
