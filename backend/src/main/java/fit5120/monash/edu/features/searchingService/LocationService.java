@@ -25,6 +25,8 @@ import java.util.Locale;
 @Service
 public class LocationService {
 
+
+
     @Autowired
     private LocationMapper locationMapper;
 
@@ -44,10 +46,6 @@ public class LocationService {
                 .orElse(null);
         log.info("today's hours: " + todayHours);
         if (todayHours == null) return false;
-
-
-
-
 
         try {
             String timeRange = todayHours.split(": ")[1];
@@ -82,7 +80,6 @@ public class LocationService {
     }
 
 
-
     private LocationResponse buildLocationResponse(Location location, Double distance){
         LocationResponse response = new LocationResponse();
         response.setId(location.getId());
@@ -114,10 +111,6 @@ public class LocationService {
         log.info(response.getOpenDescription().toString());
 
         response.setOpenNow(timeChecker(response.getOpenDescription()));
-
-
-
-
         return response;
     }
 

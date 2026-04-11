@@ -2,6 +2,8 @@ package fit5120.monash.edu.entity;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -21,6 +23,8 @@ public class Service {
     private Boolean wheelchairSeating;
 
     private String weekdayDescription;
+
+    private LocalDateTime updateTime;
 
     //foreign key:
     private Integer locationId;

@@ -49,6 +49,7 @@ public class ServiceSearchingController {
 
 
 
+
 //    @PostMapping(ApiPaths.Location.GETALLSERVICESLOCATION)
 //    public Resp<?> getAllServicesLocation(@RequestBody SearchingAllServiceRequire sasr){
 //        return Resp.success(serviceSearchingService.getAllServicesLocation(sasr));
