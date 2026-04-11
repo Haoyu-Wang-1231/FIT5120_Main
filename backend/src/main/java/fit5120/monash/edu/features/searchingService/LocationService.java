@@ -6,10 +6,13 @@ import fit5120.monash.edu.common.util.GeoCalculator;
 import fit5120.monash.edu.common.util.JsonUtil;
 import fit5120.monash.edu.entity.Location;
 import fit5120.monash.edu.features.searchingService.dto.model.AccessibilityOptionsModel;
+import fit5120.monash.edu.features.searchingService.dto.model.AllServicesModel;
 import fit5120.monash.edu.features.searchingService.dto.model.ServiceDetail;
 import fit5120.monash.edu.features.searchingService.dto.request.AccessibilityServicesRequire;
+import fit5120.monash.edu.features.searchingService.dto.request.AllServicesRequest;
 import fit5120.monash.edu.features.searchingService.dto.request.SearchingAllLocationRequire;
 import fit5120.monash.edu.features.searchingService.dto.response.AccessibilityOptionServiceResponse;
+import fit5120.monash.edu.features.searchingService.dto.response.AllServicesResponse;
 import fit5120.monash.edu.features.searchingService.dto.response.LocationResponse;
 import fit5120.monash.edu.features.searchingService.dto.response.ServiceDetailResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -64,18 +67,38 @@ public class LocationService {
                     .replace("\u2009", " ")
                     .replace("–", "-");
 
-            String[] times = timeRange.split(" - ");
-
+            String[] ranges = timeRange.split(", ");
 
             DateTimeFormatter formatter =
                     DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
 
-            LocalTime openTime = LocalTime.parse(times[0], formatter);
-            LocalTime closeTime = LocalTime.parse(times[1], formatter);
+            for (String range : ranges) {
+                String[] times = range.split(" - ");
+
+                if (times.length != 2) continue;
+
+                String start = times[0].trim();
+                String end = times[1].trim();
+
+                if (!start.toUpperCase().contains("AM") && !start.toUpperCase().contains("PM")) {
+                    if (end.toUpperCase().contains("AM")) {
+                        start += " AM";
+                    } else if (end.toUpperCase().contains("PM")) {
+                        start += " PM";
+                    }
+                }
 
 
-            return !currentTime.isBefore(openTime)
-                    && currentTime.isBefore(closeTime);
+                LocalTime openTime = LocalTime.parse(start, formatter);
+                LocalTime closeTime = LocalTime.parse(end, formatter);
+
+                if (!currentTime.isBefore(openTime)
+                        && currentTime.isBefore(closeTime)) {
+                    return true;
+                }
+            }
+
+            return false;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -99,6 +122,7 @@ public class LocationService {
 
     private AccessibilityOptionServiceResponse buildAccessibilityOptionServiceResponse(AccessibilityOptionsModel model, Double distance){
         AccessibilityOptionServiceResponse response = new AccessibilityOptionServiceResponse();
+        response.setId(model.getId());
         response.setServiceName(model.getServiceName());
         response.setPlaceName(model.getPlaceName());
         response.setRating(model.getRating());
@@ -111,8 +135,6 @@ public class LocationService {
         response.setDistance(distance);
 
         response.setOpenDescription(JsonUtil.toList(model.getWeekdayDescription()));
-        log.info(response.getOpenDescription().toString());
-//
         response.setOpenNow(timeChecker(response.getOpenDescription()));
         return response;
     }
@@ -148,10 +170,12 @@ public class LocationService {
         return responses;
     }
 
+    //Todo: add service type in it.
     public List<?> getAccessibilityOptionService(AccessibilityServicesRequire asr){
         log.info("get accessibility option service.");
         Integer limit = asr.getLimit();
-        if(asr.getAccessibilityOptions().getIsNeedAccessibility() == false){
+        if(asr.getAccessibilityOptions().getIsNeedAccessibility() == false && asr.getServiceType() == null){
+            log.info("return normal locationResponse.");
             List<Location> locations = locationMapper.getAllLocations();
             List<LocationResponse> responses = new ArrayList<>();
 
@@ -178,8 +202,9 @@ public class LocationService {
             return responses;
         }
 
-
+        log.info("return normal accessibilityOptionModel.");
         List<AccessibilityOptionsModel> models = locationMapper.getAccessibilityOptionService(
+                asr.getServiceType(),
                 asr.getAccessibilityOptions().getWheelchairPark(),
                 asr.getAccessibilityOptions().getWheelchairEntrance(),
                 asr.getAccessibilityOptions().getWheelchairRestroom(),
@@ -206,6 +231,7 @@ public class LocationService {
                         .limit(limit)
                         .toList();
             }
+            return responses;
         }
 
 
@@ -222,10 +248,33 @@ public class LocationService {
         response.setRating(detail.getRating());
         response.setRatingNumber(detail.getRatingNumber());
 
-        response.setWheelchairPark(detail.getWheelchairPark());
-        response.setWheelchairEntrance(detail.getWheelchairEntrance());
-        response.setWheelchairRestroom(detail.getWheelchairRestroom());
-        response.setWheelchairSeating(detail.getWheelchairSeating());
+        if(detail.getWheelchairPark() == null){
+            response.setWheelchairPark(false);
+        }else {
+            response.setWheelchairPark(detail.getWheelchairPark());
+        }
+
+        if(detail.getWheelchairEntrance() == null){
+            response.setWheelchairEntrance(false);
+        }else {
+            response.setWheelchairEntrance(detail.getWheelchairEntrance());
+        }
+
+        if(detail.getWheelchairRestroom() == null){
+            response.setWheelchairRestroom(false);
+        }else {
+            response.setWheelchairRestroom(detail.getWheelchairRestroom());
+        }
+
+        if(detail.getWheelchairSeating() == null){
+            response.setWheelchairSeating(false);
+        }else {
+            response.setWheelchairSeating(detail.getWheelchairSeating());
+        }
+//        response.setWheelchairPark(detail.getWheelchairPark());
+//        response.setWheelchairEntrance(detail.getWheelchairEntrance());
+//        response.setWheelchairRestroom(detail.getWheelchairRestroom());
+//        response.setWheelchairSeating(detail.getWheelchairSeating());
 
 
         response.setAddress(detail.getAddress());
@@ -237,6 +286,8 @@ public class LocationService {
 
         response.setOpenDescription(JsonUtil.toList(detail.getWeekdayDescription()));
         response.setOpenNow(timeChecker(response.getOpenDescription()));
+
+        response.setServiceType(detail.getServiceType());
 
         return response;
     }
@@ -253,6 +304,92 @@ public class LocationService {
 
         return buildServiceDetailResponse(detail);
     }
+
+    private AllServicesResponse buildAllServiceResponse(AllServicesModel model, Double distance){
+        AllServicesResponse response = new AllServicesResponse();
+        response.setId(model.getId());
+        response.setServiceName(model.getServiceName());
+        response.setPlaceName(model.getPlaceName());
+        response.setContactNumber(model.getContactNumber());
+        response.setWebsite(model.getWebsite());
+
+
+        if(model.getWheelchairPark() == null){
+            response.setWheelchairPark(false);
+        }else {
+            response.setWheelchairPark(model.getWheelchairPark());
+        }
+
+        if(model.getWheelchairEntrance() == null){
+            response.setWheelchairEntrance(false);
+        }else {
+            response.setWheelchairEntrance(model.getWheelchairEntrance());
+        }
+
+        if(model.getWheelchairRestroom() == null){
+            response.setWheelchairRestroom(false);
+        }else {
+            response.setWheelchairRestroom(model.getWheelchairRestroom());
+        }
+
+        if(model.getWheelchairSeating() == null){
+            response.setWheelchairSeating(false);
+        }else {
+            response.setWheelchairSeating(model.getWheelchairSeating());
+        }
+
+
+
+
+
+        response.setSuburb(model.getSuburb());
+        response.setState(model.getState());
+        response.setPostcode(model.getPostcode());
+        response.setLatitude(model.getLatitude());
+        response.setLongitude(model.getLongitude());
+
+        response.setServiceType(model.getServiceType());
+
+        response.setDistance(distance);
+
+        response.setOpenDescription(JsonUtil.toList(model.getWeekdayDescription()));
+        response.setOpenNow(timeChecker(response.getOpenDescription()));
+
+        return response;
+    }
+
+
+    public List<?> getAllServices(AllServicesRequest request){
+        log.info("get all services");
+        List<AllServicesModel> models = locationMapper.getAllServices(request.getServiceType());
+        List<AllServicesResponse> responses = new ArrayList<>();
+
+        for(AllServicesModel model: models){
+            Double distance = GeoCalculator.calculateDistance(
+                    request.getLatitude(),
+                    request.getLongitude(),
+                    model.getLatitude(),
+                    model.getLongitude()
+            );
+            AllServicesResponse response = buildAllServiceResponse(model, distance);
+            responses.add(response);
+        }
+
+
+        responses.sort(Comparator.comparing(AllServicesResponse::getDistance));
+        Integer limit = request.getLimit();
+        if(limit != null){
+            if(responses.size() > limit){
+                return responses.stream()
+                        .limit(limit)
+                        .toList();
+            }
+            return responses;
+        }
+        return responses;
+    }
+
+
 
 
 }

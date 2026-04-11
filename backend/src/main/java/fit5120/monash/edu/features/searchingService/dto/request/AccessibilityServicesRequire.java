@@ -10,6 +10,7 @@ public class AccessibilityServicesRequire {
     private Double longitude;
 
     private Integer limit;
+    private String serviceType;
     private AccessibilityOptions accessibilityOptions;
 
     @Data

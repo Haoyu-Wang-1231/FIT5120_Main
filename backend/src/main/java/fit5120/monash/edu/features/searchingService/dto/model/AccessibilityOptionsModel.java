@@ -4,6 +4,8 @@ import lombok.Data;
 
 @Data
 public class AccessibilityOptionsModel {
+
+    private Integer id;
     private String serviceName;
     private String placeName;
 

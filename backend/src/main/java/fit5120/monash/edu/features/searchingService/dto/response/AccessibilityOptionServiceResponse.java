@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class AccessibilityOptionServiceResponse {
 
+    private Integer id;
     private String serviceName;
     private String placeName;
 

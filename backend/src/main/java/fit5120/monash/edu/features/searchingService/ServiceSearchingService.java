@@ -16,6 +16,7 @@ import java.util.Locale;
 
 @Slf4j
 @Service
+@Deprecated
 public class ServiceSearchingService {
 
     @Value("${google.api.key}")

@@ -5,6 +5,7 @@ import fit5120.monash.edu.api.ApiPaths;
 import fit5120.monash.edu.common.result.Resp;
 import fit5120.monash.edu.common.result.RespEnum;
 import fit5120.monash.edu.features.searchingService.dto.request.AccessibilityServicesRequire;
+import fit5120.monash.edu.features.searchingService.dto.request.AllServicesRequest;
 import fit5120.monash.edu.features.searchingService.dto.request.SearchingAllLocationRequire;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +46,10 @@ public class ServiceSearchingController {
     }
 
 
-
+    @PostMapping(ApiPaths.Service.getAllServices)
+    public Resp<?> getAllServices(@RequestBody AllServicesRequest request){
+        return Resp.success(locationService.getAllServices(request));
+    }
 
 
 

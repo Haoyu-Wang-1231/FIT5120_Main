@@ -12,6 +12,7 @@
 
     <select id="getAccessibilityOptionService" resultType="fit5120.monash.edu.features.searchingService.dto.model.AccessibilityOptionsModel">
         SELECT
+            s.id,
             s.serviceName,
             s.placeName,
             s.rating,
@@ -24,6 +25,10 @@
         LEFT JOIN location l ON s.locationId = l.id
         LEFT JOIN serviceType t ON s.serviceTypeId = t.id
         <where>
+            <if test="serviceType != null">
+                AND t.serviceType = #{serviceType}
+            </if>
+
             <if test="wheelchairPark != null and wheelchairPark == true" >
                 AND s.wheelchairPark = #{wheelchairPark}
             </if>
@@ -59,6 +64,36 @@
         where s.id = #{id};
 
     </select>
+
+    <select id="getAllServices">
+        select
+            s.id,
+            s.serviceName,
+            s.placeName,
+            s.contactNumber,
+            s.website,
+            s.wheelchairPark,
+            s.wheelchairEntrance,
+            s.wheelchairRestroom,
+            s.wheelchairSeating,
+            s.weekdayDescription,
+            l.suburb,
+            l.state,
+            l.postcode,
+            l.latitude,
+            l.longitude,
+            t.serviceType
+        from service s
+        LEFT JOIN location l on s.locationId = l.id
+        LEFT JOIN serviceType t on s.serviceTypeid = t.id
+        <where>
+            <if test="serviceType != null">
+                And t.serviceType = #{serviceType}
+            </if>
+        </where>
+    </select>
+
+
 
 
     <select id="selectLocationById" resultType="fit5120.monash.edu.entity.Location">
