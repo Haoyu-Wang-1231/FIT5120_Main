@@ -8,7 +8,7 @@ public class AccessibilityOptionsModel {
     private String placeName;
 
     private String rating;
-    private Boolean ratingNumber;
+    private Integer ratingNumber;
     private String weekdayDescription;
 
     //location

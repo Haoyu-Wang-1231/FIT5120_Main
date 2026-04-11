@@ -17,6 +17,11 @@ public final class ApiPaths {
         public static final String getAllServiceLocation = "/getAllServicesLocation";
         public static final String getAccessibilityOptionService = "/getAccessibilityService";
         public static final String getServiceDetail = "/getServiceDetail/{id}";
+
+
+
+
+
     }
 
 }

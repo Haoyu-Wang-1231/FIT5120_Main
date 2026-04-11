@@ -1,5 +1,7 @@
 package fit5120.monash.edu.features.searchingService;
 
+import fit5120.monash.edu.common.exception.ResourcesNotFoundException;
+import fit5120.monash.edu.common.result.RespEnum;
 import fit5120.monash.edu.common.util.GeoCalculator;
 import fit5120.monash.edu.common.util.JsonUtil;
 import fit5120.monash.edu.entity.Location;
@@ -9,6 +11,7 @@ import fit5120.monash.edu.features.searchingService.dto.request.AccessibilitySer
 import fit5120.monash.edu.features.searchingService.dto.request.SearchingAllLocationRequire;
 import fit5120.monash.edu.features.searchingService.dto.response.AccessibilityOptionServiceResponse;
 import fit5120.monash.edu.features.searchingService.dto.response.LocationResponse;
+import fit5120.monash.edu.features.searchingService.dto.response.ServiceDetailResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -44,7 +48,7 @@ public class LocationService {
                 .filter(s -> s.startsWith(finalTodayStr))
                 .findFirst()
                 .orElse(null);
-        log.info("today's hours: " + todayHours);
+//        log.info("today's hours: " + todayHours);
         if (todayHours == null) return false;
 
         try {
@@ -99,7 +103,6 @@ public class LocationService {
         response.setPlaceName(model.getPlaceName());
         response.setRating(model.getRating());
         response.setRatingNumber(model.getRatingNumber());
-        response.setWeekdayDescription(model.getWeekdayDescription());
 
         response.setLatitude(model.getLatitude());
         response.setLongitude(model.getLongitude());
@@ -109,7 +112,7 @@ public class LocationService {
 
         response.setOpenDescription(JsonUtil.toList(model.getWeekdayDescription()));
         log.info(response.getOpenDescription().toString());
-
+//
         response.setOpenNow(timeChecker(response.getOpenDescription()));
         return response;
     }
@@ -128,11 +131,26 @@ public class LocationService {
             LocationResponse response = buildLocationResponse(location, distance);
             responses.add(response);
         }
+
+        responses.sort(Comparator.comparing(LocationResponse::getDistance));
+
+        Integer limit = searchingAllLocationRequire.getLimit();
+
+        if(limit != null){
+            if(responses.size() > limit){
+                return responses.stream()
+                        .limit(limit)
+                        .toList();
+            }
+        }
+
+
         return responses;
     }
 
     public List<?> getAccessibilityOptionService(AccessibilityServicesRequire asr){
         log.info("get accessibility option service.");
+        Integer limit = asr.getLimit();
         if(asr.getAccessibilityOptions().getIsNeedAccessibility() == false){
             List<Location> locations = locationMapper.getAllLocations();
             List<LocationResponse> responses = new ArrayList<>();
@@ -146,6 +164,16 @@ public class LocationService {
                 );
                 LocationResponse response = buildLocationResponse(location, distance);
                 responses.add(response);
+            }
+
+
+            responses.sort(Comparator.comparing(LocationResponse::getDistance));
+            if(limit != null){
+                if(responses.size() > 10){
+                    return responses.stream()
+                            .limit(10)
+                            .toList();
+                }
             }
             return responses;
         }
@@ -169,23 +197,61 @@ public class LocationService {
             AccessibilityOptionServiceResponse response =buildAccessibilityOptionServiceResponse(model, distance);
             responses.add(response);
         }
+
+        responses.sort(Comparator.comparing(AccessibilityOptionServiceResponse::getDistance));
+
+        if(limit != null){
+            if(responses.size() > limit){
+                return responses.stream()
+                        .limit(limit)
+                        .toList();
+            }
+        }
+
+
         return responses;
     }
 
-    public ServiceDetail getServiceDetail(Integer id){
+    private ServiceDetailResponse buildServiceDetailResponse(ServiceDetail detail){
+        ServiceDetailResponse response = new ServiceDetailResponse();
+        response.setId(detail.getId());
+        response.setAddress(detail.getAddress());
+        response.setPlaceName(detail.getPlaceName());
+        response.setContactNumber(detail.getContactNumber());
+        response.setWebsite(detail.getWebsite());
+        response.setRating(detail.getRating());
+        response.setRatingNumber(detail.getRatingNumber());
+
+        response.setWheelchairPark(detail.getWheelchairPark());
+        response.setWheelchairEntrance(detail.getWheelchairEntrance());
+        response.setWheelchairRestroom(detail.getWheelchairRestroom());
+        response.setWheelchairSeating(detail.getWheelchairSeating());
+
+
+        response.setAddress(detail.getAddress());
+        response.setSuburb(detail.getSuburb());
+        response.setState(detail.getState());
+        response.setPostcode(detail.getPostcode());
+        response.setLatitude(detail.getLatitude());
+        response.setLongitude(detail.getLongitude());
+
+        response.setOpenDescription(JsonUtil.toList(detail.getWeekdayDescription()));
+        response.setOpenNow(timeChecker(response.getOpenDescription()));
+
+        return response;
+    }
+
+    public ServiceDetailResponse getServiceDetail(Integer id){
         log.info("getServiceDetail");
 
-        try{
-            log.info("start");
-            ServiceDetail detail = locationMapper.getServiceDetailById(id);
-            if(detail != null){
-                return detail;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        ServiceDetail detail = locationMapper.getServiceDetailById(id);
+        if(detail ==null){
+            throw new ResourcesNotFoundException(RespEnum.NOT_FOUND);
+
         }
 
-        return null;
+
+        return buildServiceDetailResponse(detail);
     }
 
 

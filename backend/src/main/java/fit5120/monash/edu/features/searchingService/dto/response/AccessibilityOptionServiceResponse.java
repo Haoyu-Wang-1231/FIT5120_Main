@@ -11,10 +11,9 @@ public class AccessibilityOptionServiceResponse {
     private String placeName;
 
     private String rating;
-    private Boolean ratingNumber;
+    private Integer ratingNumber;
 
     private Double distance;
-    private String weekdayDescription;
     //location
     private Double latitude;
     private Double longitude;

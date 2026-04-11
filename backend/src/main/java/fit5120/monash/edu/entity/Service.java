@@ -15,7 +15,7 @@ public class Service {
     private String contactNumber;
     private String website;
     private String rating;
-    private Boolean ratingNumber;
+    private Integer ratingNumber;
 
     private Boolean wheelchairPark;
     private Boolean wheelchairEntrance;

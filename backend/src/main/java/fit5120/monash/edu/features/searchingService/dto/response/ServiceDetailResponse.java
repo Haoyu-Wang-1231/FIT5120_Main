@@ -1,9 +1,11 @@
-package fit5120.monash.edu.features.searchingService.dto.model;
+package fit5120.monash.edu.features.searchingService.dto.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class ServiceDetail {
+public class ServiceDetailResponse {
     private Integer id;
     private String serviceName;
     private String placeName;
@@ -17,7 +19,8 @@ public class ServiceDetail {
     private Boolean wheelchairRestroom;
     private Boolean wheelchairSeating;
 
-    private String weekdayDescription;
+    private Boolean openNow;
+    private List<String> openDescription;
 
     private String address;
     private String suburb;
@@ -27,5 +30,10 @@ public class ServiceDetail {
     private Double longitude;
 
     private String serviceType;
+
+
+
+
+
 
 }

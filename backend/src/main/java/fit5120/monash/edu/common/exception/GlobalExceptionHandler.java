@@ -10,7 +10,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourcesNotFoundException.class)
     public Resp<?> handleResourcesNotFoundException(ResourcesNotFoundException e){
-        e.printStackTrace();
+//        e.printStackTrace();
         return Resp.error(e.getCode(), e.getMessage());
     }
 
